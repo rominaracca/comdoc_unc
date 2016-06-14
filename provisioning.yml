@@ -4,11 +4,20 @@
 ##### Activate privilege escalation
   become: yes
   vars:
-   - nfs_server: 'nfs-kernel-server'
+   - jboss_path: '/usr/local/jboss'
+   - comdoc_path: '/usr/local/jboss/server/comdoc'
 ##### Tasks section
   tasks:
-##### Ansible apt module to manage Ubuntu packages. Install nfs-kernel-server package. Reference to variable 'nfs_server'
-   - name: ensure software properties common and python software properties
+##### apt-get upgrade-dist
+   - name: install newest version of all package
+     apt: upgrade=dist
+##### Ansible apt module to manage Ubuntu packages.
+   - name: install java-7 and unzip
      apt: name={{ item }} update_cache=yes state=latest
      with_items:
        - openjdk-7-jdk
+       - unzip
+##### Download and unzip Jboss 4.2.2
+   - unarchive: src=https://sourceforge.net/projects/jboss/files/JBoss/JBoss-4.2.2.GA/jboss-4.2.2.GA.zip/download  dest=/usr/local creates=jboss copy=no
+#####  	
+
