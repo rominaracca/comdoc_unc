@@ -1,0 +1,14 @@
+##### Comdoc Play.
+##### Apply comdoc play to comdoc server
+- hosts: comdoc
+##### Activate privilege escalation
+  become: yes
+  vars:
+   - nfs_server: 'nfs-kernel-server'
+##### Tasks section
+  tasks:
+##### Ansible apt module to manage Ubuntu packages. Install nfs-kernel-server package. Reference to variable 'nfs_server'
+   - name: ensure software properties common and python software properties
+     apt: name={{ item }} update_cache=yes state=latest
+     with_items:
+       - openjdk-7-jdk
