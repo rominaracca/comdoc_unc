@@ -4,20 +4,58 @@
 ##### Activate privilege escalation
   become: yes
   vars:
-   - jboss_path: '/usr/local/jboss'
-   - comdoc_path: '/usr/local/jboss/server/comdoc'
+   - jboss_path: '/usr/local/jboss-4.2.2.GA'
+   - comdoc_path: '/usr/local/jboss-4.2.2.GA/server/comdoc'
 ##### Tasks section
   tasks:
-##### apt-get upgrade-dist
-   - name: install newest version of all package
+   
+   - name: install newest version of all package (apt-get upgrade-dist)
      apt: upgrade=dist
-##### Ansible apt module to manage Ubuntu packages.
-   - name: install java-7 and unzip
+
+   - name: install java-7, unzip and xvfb
      apt: name={{ item }} update_cache=yes state=latest
      with_items:
        - openjdk-7-jdk
        - unzip
-##### Download and unzip Jboss 4.2.2
-   - unarchive: src=https://sourceforge.net/projects/jboss/files/JBoss/JBoss-4.2.2.GA/jboss-4.2.2.GA.zip/download  dest=/usr/local creates=jboss copy=no
-#####  	
+       - xvfb
+
+   #- name: download and unzip Jboss 4.2.2	
+   #  unarchive: src=https://sourceforge.net/projects/jboss/files/JBoss/JBoss-4.2.2.GA/jboss-4.2.2.GA.zip/download dest=/usr/local copy=no
+
+   - name: Remove Jboss file (xalam.jar)
+     file: path={{jboss_path}}/lib/endorsed/xalam.jar state=absent
+
+   - name: Remove Jboss file (serializer.jar)
+     file: path={{jboss_path}}/lib/endorsed/serializer.jar state=absent 	
+
+   - name: Copy default Jboss template for ComDoc
+     command: cp -r {{jboss_path}}/server/default {{comdoc_path}} creates={{comdoc_path}}
+
+   - name: Remove Jboss file in ComDoc/deploy
+     file: name={{comdoc_path}}/deploy/{{item}} state=absent
+     with_items: 
+        - jms/
+        - jbossws.sar/ 
+        - htpha-invoker.sar/
+        - uuid-key-generator.sar/
+        - ejb3.deployer/
+        - ejb3-interceptors-aop.xml/
+        - mail-service.xml/
+        - jboss-ha-local-jdbc.rar/
+        - jboss-ha-xa-jdbc.rar/
+        - jboss-xa-jdbc.rar/
+        - quartz-ra.rar/
+        - hsqldb-ds.xml/
+
+   - name: Modification ejb-deployer.xml
+     get_url: url=https://raw.githubusercontent.com/rominaracca/comdoc_unc/master/assets/ejb-deployer.xml dest={{comdoc_path}}/deploy force=yes
+
+   #- name: Download jboss_init.sh
+     # get_url: url=https://raw.githubusercontent.com/rominaracca/comdoc_unc/master/assets/jboss_init.sh dest=/etc/init.d
+
+   #- name: Tem 
+
+## asignacion de memoria a jboss /usr/local/jboss/bin/run.conf
+
+## xvfb
 
