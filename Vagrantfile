@@ -27,7 +27,7 @@ Vagrant.configure('2') do |config|
     comdoc.ssh.username    = 'ubuntu'
 ##### Configure all VMs with Ansible. Uncoment the folowwing four lines.
     comdoc.vm.provision :ansible do |ansible|
-      ansible.playbook = "provisioning.yml"
+      ansible.playbook = "playbook-comdoc.yml"
       ansible.limit = 'all'
     end
   end
